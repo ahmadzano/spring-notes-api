@@ -1,0 +1,15 @@
+spring:
+  profiles:
+    active: dev
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database: mysql
+    show-sql: true
+  h2:
+    console:
+      enabled: true
+      path: /h2
+
+server:
+  port: 80
