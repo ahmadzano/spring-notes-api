@@ -13,7 +13,6 @@ public class PersistenceConfiguration {
     @Bean
     @Profile("dev")
     public DataSource primaryDataSource() {
-
         return DataSourceBuilder.create()
                 .url("jdbc:h2:file:~/default")
                 .username("sa")
@@ -24,11 +23,11 @@ public class PersistenceConfiguration {
     @Bean
     @Profile("prod")
     public DataSource secondaryDataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("org.mariadb.jdbc.Driver");
-        dataSource.setUrl("jdbc:mariadb://localhost/db");
-        dataSource.setUsername("root");
-        dataSource.setPassword("");
-        return dataSource;
+        return DataSourceBuilder.create()
+                .driverClassName("org.mariadb.jdbc.Driver")
+                .url("jdbc:mariadb://localhost/db")
+                .username("root")
+                .password("")
+                .build();
     }
 }
