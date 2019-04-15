@@ -59,6 +59,11 @@
             <artifactId>flyway-core</artifactId>
             <version>5.2.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -4,8 +4,8 @@ import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.notee.notes.model.User;
-import com.notee.notes.repository.UserRepository;
+import com.notee.notes.NotesApplication;
+import com.notee.notes.model.Payload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +15,14 @@ import com.notee.notes.model.Note;
 import com.notee.notes.repository.NoteRepository;
 
 @RestController
+@CrossOrigin
 public class NoteController {
 
     private final NoteRepository noteRepository;
-    private final UserRepository userRepository;
 
     @Autowired
-    public NoteController(NoteRepository noteRepository, UserRepository userRepository) {
+    public NoteController(NoteRepository noteRepository) {
         this.noteRepository = noteRepository;
-        this.userRepository = userRepository;
     }
 
     @RequestMapping(value = "/notes/{id}", method = RequestMethod.GET)
@@ -37,21 +36,25 @@ public class NoteController {
     }
 
     @RequestMapping(path = "/notes", method = RequestMethod.POST)
-    public ResponseEntity<?> createNote(@RequestParam(name = "content", required = false) String content,
-                                        @RequestParam(name = "username") String username,
-                                        @RequestParam(name = "type") String type) {
+    public ResponseEntity<?> createNote(@RequestBody Payload payload) {
         Note newNote = new Note();
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            return new ResponseEntity<Note>(HttpStatus.NOT_FOUND);
+        try {
+            newNote.setContent(payload.getContent());
+            newNote.setUserId(payload.getUserId());
+            newNote.setUuid(UUID.randomUUID());
+            newNote.setType(payload.getType());
+            newNote.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+
+            return new ResponseEntity<>(noteRepository.save(newNote), HttpStatus.OK);
+
+        } catch (Exception exception) {
+            NotesApplication.logger.error(exception.getMessage());
+            return new ResponseEntity<>(newNote, HttpStatus.BAD_REQUEST);
         }
+    }
 
-        newNote.setContent(content);
-        newNote.setUserId(user.getId());
-        newNote.setUuid(UUID.randomUUID());
-        newNote.setType(type);
-        newNote.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-
-        return new ResponseEntity<>(noteRepository.save(newNote), HttpStatus.OK);
+    @RequestMapping(path = "/notes", method = RequestMethod.GET)
+    public ResponseEntity<?> createNote() {
+        return new ResponseEntity<>(noteRepository.findAll(), HttpStatus.OK);
     }
 }
